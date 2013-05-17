@@ -4,7 +4,7 @@ django-backup
 
 Repository: http://github.com/andybak/django-backup
 
-Backup, compress and restore database and media files. 
+Backup, compress and restore Django database and media files. 
 Transfer them via email or FTP and maintain a set number of dated versions on remote FTP server.
 
 Requirements
@@ -23,6 +23,14 @@ so you couldn't install it via pip. Instead, you can clone it and install::
     cd django-backup
     python setup.py build
     python setup.py install
+
+The add ``django_backup`` to ``INSTALLED_APPS``::
+
+    INSTALLED_APPS = (
+        ...
+        'django_backup',
+        ..
+    )
 
 New Features in this fork
 -------------------------
@@ -43,13 +51,13 @@ Supported options for manage.py backup
 
     --email             Sends email with attached dump file
 
-    --compress -c       Compress SQL dump file
+    --c --compress      Compress SQL dump file
 
-    --ftp -f            Store backup on remote FTP server
+    -f --ftp            Store backup on remote FTP server
 
-    --media -m          Backup media dirs as well as SQL dump
+    --m --media         Backup media dirs as well as SQL dump
 
-    --rsync -r          Backup media dirs with rsync
+    --r --rsync         Backup media dirs with rsync
 
     --nolocal           Keep local copies of backup
 
@@ -85,10 +93,12 @@ Extra Settings
     BACKUP_FTP_SERVER = 'example.com'
     BACKUP_FTP_USERNAME = 'username'
     BACKUP_FTP_PASSWORD = 'password'
-    BACKUP_FTP_DIRECTORY = '/path/to/backups/mysite' # If you store multiple backups on the same remote server ensure each one is in a different directory
+    # If you store multiple backups on the same remote server ensure each one is in a different directory
+    BACKUP_FTP_DIRECTORY = '/path/to/backups/mysite'
     RESTORE_FROM_FTP_DIRECTORY = '/path/to/backups/mysite' # Where does the restore
     
-    # How many db backups should we keep on remote FTP? i.e. 1 per day for the last 7 days plus 1 per week for the last 4 weeks etc.
+    # How many db backups should we keep on remote FTP? 
+    # i.e. 1 per day for the last 7 days plus 1 per week for the last 4 weeks etc.
     BACKUP_DATABASE_COPIES = {
         'daily': 7,
         'weekly': 4,
@@ -101,7 +111,6 @@ Extra Settings
         'weekly': 2,
         'monthly': 4,
     }
-
 
 
 Examples
@@ -119,7 +128,8 @@ db plus SFTP media backup::
 
     python manage.py backup --media --ftp
   
-db plus rsync media backup, validate remote rsync backups, clearn surplus media and db backs, and do not keep local copies of backups::
+db plus rsync media backup, validate remote rsync backups, 
+clean surplus media and db backs, and do not keep local copies of backups::
 
     python manage.py backup --media --rsync --ftp --deletelocal --cleanremotedb --cleanremotemedia --cleanremotersync
     

@@ -1,24 +1,28 @@
+=============
 django-backup
 =============
-http://github.com/andybak/django-backup
 
-Backup, compress and restore database and media files. Transfer them via email or FTP and maintain a set number of dated versions on remote FTP server.
+Repository: http://github.com/andybak/django-backup
+
+Backup, compress and restore database and media files. 
+Transfer them via email or FTP and maintain a set number of dated versions on remote FTP server.
 
 Requirements
 ------------
 
 My fork of Pysftp: https://github.com/andybak/Pysftp
-(a nice friendly wrapper around Paramiko: https://github.com/robey/paramiko)
+(a nice friendly wrapper around `Paramiko <https://github.com/robey/paramiko>`_)
 
-Authors
--------
+Installation
+------------
 
-* project started by Dmitriy Kovalev (http://code.google.com/p/django-backup/ http://code.google.com/u/dmitriy.kovalev/)
-* based off of backupdb command by msaelices (http://www.djangosnippets.org/snippets/823/)
-* and also snippets from http://www.yashh.com/blog/2008/sep/05/django-database-backup-view/
-* with minor modifications by Michael Huynh (mike@mikexstudios.com) http://github.com/mikexstudios/django-backup
-* Major modifications in this fork by Andy Baker (andy@andybak.net and Chen Zhe (fruitschen@gmail.com)
+At this moment, another fork of django-backup lives on pypi,
+so you couldn't install it via pip. Instead, you can clone it and install::
 
+    git clone git@github.com:andybak/django-backup.git
+    cd django-backup
+    python setup.py build
+    python setup.py install
 
 New Features in this fork
 -------------------------
@@ -34,115 +38,106 @@ New Features in this fork
 
 Supported options for manage.py backup
 --------------------------------------
+
 ::
-    --email
-    default=None
-    Sends email with attached dump file
 
-    --compress -c
-    default=False
-    Compress SQL dump file
+    --email             Sends email with attached dump file
 
-    --ftp -f
-    default=False
-    Store backup on remote FTP server
+    --compress -c       Compress SQL dump file
 
-    --media -m
-    default=False
-    Backup media dirs as well as SQL dump
+    --ftp -f            Store backup on remote FTP server
 
-    --rsync -r
-    default=False
-    Backup media dirs with rsync
+    --media -m          Backup media dirs as well as SQL dump
 
-    --nolocal
-    default=False
-    Keep local copies of backup
+    --rsync -r          Backup media dirs with rsync
 
-    --deletelocal
-    default=False
-    Delete all local backups
+    --nolocal           Keep local copies of backup
 
-    --cleandb
-    default=False
-    Clean up surplus database backups
+    --deletelocal       Delete all local backups
 
-    --cleanmedia
-    default=False
-    Clean up surplus media backups
+    --cleandb           Clean up surplus database backups
 
-    --cleanlocaldb
-    default=False
-    Clean up surplus local database backups
+    --cleanmedia        Clean up surplus media backups
 
-    --cleanlocalmedia
-    default=False
-    Clean up surplus local media backups
+    --cleanlocaldb      Clean up surplus local database backups
 
-    --cleanremotedb
-    default=False
-    Clean up surplus remote database backups
+    --cleanlocalmedia   Clean up surplus local media backups
 
-    --cleanremotemedia
-    default=False
-    Clean up surplus remote media backups
+    --cleanremotedb     Clean up surplus remote database backups
 
-    --cleanrsync
-    default=False
-    Clean up broken rsync backups
+    --cleanremotemedia  Clean up surplus remote media backups
+
+    --cleanrsync        Clean up broken rsync backups
     
-    --cleanlocalrsync
-    default=False
-    Clean up local broken rsync backups
+    --cleanlocalrsync   Clean up local broken rsync backups
     
-    --cleanremotersync
-    default=False
-    Clean up remote broken rsync backups
-    
+    --cleanremotersync  Clean up remote broken rsync backups
+
+
 Extra Settings
 --------------
-::
-  BACKUP_SQLDUMP_PATH = '/path/to/mysqldump' # mysqldump binary location
-  BACKUP_LOCAL_DIRECTORY = '/path/to/backups' # Where to store local backups
 
-  BACKUP_FTP_SERVER = 'example.com'
-  BACKUP_FTP_USERNAME = 'username'
-  BACKUP_FTP_PASSWORD = 'password'
-  BACKUP_FTP_DIRECTORY = '/path/to/backups/mysite' # If you store multiple backups on the same remote server ensure each one is in a different directory
-  RESTORE_FROM_FTP_DIRECTORY = '/path/to/backups/mysite' # Where does the restore
+.. code:: python
 
-  # How many db backups should we keep on remote FTP? i.e. 1 per day for the last 7 days plus 1 per week for the last 4 weeks etc.
-  BACKUP_DATABASE_COPIES = {
-     'daily': 7,
-     'weekly': 4,
-     'monthly': 12,
-  }
+    BACKUP_SQLDUMP_PATH = '/path/to/mysqldump'  # mysqldump binary location
+    BACKUP_LOCAL_DIRECTORY = '/path/to/backups' # Where to store local backups
+    
+    BACKUP_FTP_SERVER = 'example.com'
+    BACKUP_FTP_USERNAME = 'username'
+    BACKUP_FTP_PASSWORD = 'password'
+    BACKUP_FTP_DIRECTORY = '/path/to/backups/mysite' # If you store multiple backups on the same remote server ensure each one is in a different directory
+    RESTORE_FROM_FTP_DIRECTORY = '/path/to/backups/mysite' # Where does the restore
+    
+    # How many db backups should we keep on remote FTP? i.e. 1 per day for the last 7 days plus 1 per week for the last 4 weeks etc.
+    BACKUP_DATABASE_COPIES = {
+        'daily': 7,
+        'weekly': 4,
+        'monthly': 12,
+    }
+    
+    # Same as above
+    BACKUP_MEDIA_COPIES = {
+        'daily': 1,
+        'weekly': 2,
+        'monthly': 4,
+    }
 
-  # Same as above
-  BACKUP_MEDIA_COPIES = {
-     'daily': 1,
-     'weekly': 2,
-     'monthly': 4,
-  }
-  
+
+
 Examples
---------------
+--------
 
-  A db-only backup
+A db-only backup::
+
     python manage.py backup --ftp
     
-  db plus rsync media backup
+db plus rsync media backup::
+
     python manage.py backup --media --rsync --ftp
-  
-  db plus SFTP media backup
+
+db plus SFTP media backup::
+
     python manage.py backup --media --ftp
   
-  db plus rsync media backup, validate remote rsync backups, clearn surplus media and db backs, and do not keep local copies of backups. 
+db plus rsync media backup, validate remote rsync backups, clearn surplus media and db backs, and do not keep local copies of backups::
+
     python manage.py backup --media --rsync --ftp --deletelocal --cleanremotedb --cleanremotemedia --cleanremotersync
     
-    or 
+or in code:
+
+.. code:: python
     
     call_command("backup", ftp=True, media=True, delete_local=True, clean_remote_db=True, clean_remote_media=True, clean_remote_rsync=True)
   
   
+Authors
+-------
+
+* project started by Dmitriy Kovalev (http://code.google.com/p/django-backup/ http://code.google.com/u/dmitriy.kovalev/)
+* based off of backupdb command by msaelices (http://www.djangosnippets.org/snippets/823/)
+* and also snippets from http://www.yashh.com/blog/2008/sep/05/django-database-backup-view/
+* with minor modifications by Michael Huynh (mike@mikexstudios.com) http://github.com/mikexstudios/django-backup
+* Major modifications in this fork by Andy Baker (andy@andybak.net and Chen Zhe (fruitschen@gmail.com)
+
   
+

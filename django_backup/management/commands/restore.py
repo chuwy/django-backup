@@ -1,24 +1,25 @@
 import os
-import time
 from optparse import make_option
 from tempfile import gettempdir
+import time
 
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
 import pysftp as ssh
 
-from backup import TIME_FORMAT
-from backup import is_db_backup
-from backup import is_media_backup
+from .backup import TIME_FORMAT
+from .backup import is_db_backup
+from .backup import is_media_backup
 
 
 class Command(BaseCommand):
     help = "Restores latest backup."
     option_list = BaseCommand.option_list + (
-        make_option('--media', '-m', action='store_true', default=False, dest='media',
-            help='Restore media dir'),
-    )
+        make_option('--media', '-m',
+                    action='store_true',
+                    dest='media',
+                    help='Restore media dir'),)
 
     def _time_suffix(self):
         return time.strftime(TIME_FORMAT)
@@ -31,7 +32,7 @@ class Command(BaseCommand):
             self.passwd = settings.DATABASES['default']['PASSWORD']
             self.host = settings.DATABASES['default']['HOST']
             self.port = settings.DATABASES['default']['PORT']
-        except NameError:
+        except NameError:       # TODO: remove >1.2 compliance
             self.engine = settings.DATABASE_ENGINE
             self.db = settings.DATABASE_NAME
             self.user = settings.DATABASE_USER
@@ -46,10 +47,10 @@ class Command(BaseCommand):
         self.ftp_password = settings.BACKUP_FTP_PASSWORD
         self.restore_media = options.get('media')
 
-        print 'Connecting to %s...' % self.ftp_server
+        print("Connecting to %s..." % self.ftp_server)
         sftp = self.get_connection()
-        print 'Connected.'
-        backups = [i.strip() for i in sftp.execute('ls %s' % (self.remote_dir))]
+        print("Connected.")
+        backups = [i.strip() for i in sftp.execute('ls %s' % self.remote_dir)]
         db_backups = filter(is_db_backup, backups)
         db_backups.sort()
         if self.restore_media:
@@ -63,45 +64,47 @@ class Command(BaseCommand):
             media_remote = media_backups[-1]
 
         db_local = os.path.join(self.tempdir, db_remote)
-        print 'Fetching database %s...' % db_remote
+        print("Fetching database %s..." % db_remote)
         sftp.get(os.path.join(self.remote_dir, db_remote), db_local)
-        print 'Uncompressing database...'
+        print("Uncompressing database...")
         uncompressed = self.uncompress(db_local)
         if uncompressed is 0:
             sql_local = db_local[:-3]
         else:
             sql_local = db_local
         if self.restore_media:
-            print 'Fetching media %s...' % media_remote
+            print("Fetching media %s..." % media_remote)
             media_local = os.path.join(self.tempdir, media_remote)
             sftp.get(os.path.join(self.remote_dir, media_remote), media_local)
-            print 'Uncompressing media...'
+            print("Uncompressing media...")
             self.uncompress_media(media_local)
         # Doing restore
         if self.engine == 'django.db.backends.mysql':
-            print 'Doing Mysql restore to database %s from %s...' % (self.db, sql_local)
+            print("Doing Mysql restore to database %s from %s..." % (self.db, sql_local))
             self.mysql_restore(sql_local)
         # TODO reinstate postgres support
         elif self.engine == 'django.db.backends.postgresql_psycopg2':
-            print 'Doing Postgresql restore to database %s from %s...' % (self.db, sql_local)
+            print("Doing Postgresql restore to database %s from %s..." % (self.db, sql_local))
             self.posgresql_restore(sql_local)
         else:
             raise CommandError('Backup in %s engine not implemented' % self.engine)
 
     def get_connection(self):
-        '''
-        get the ssh connection to the remote server.
-        '''
-        return ssh.Connection(host=self.ftp_server, username=self.ftp_username, password=self.ftp_password)
+        """
+        Get the ssh connection to the remote server.
+        """
+        return ssh.Connection(host=self.ftp_server,
+                              username=self.ftp_username,
+                              password=self.ftp_password)
 
-    def uncompress(self, file):
-        cmd = 'cd %s;gzip -df %s' % (self.tempdir, file)
-        print '\t', cmd
+    def uncompress(self, file_name):
+        cmd = 'cd %s;gzip -df %s' % (self.tempdir, file_name)
+        print('\t', cmd)
         return os.system(cmd)
 
-    def uncompress_media(self, file):
-        cmd = u'tar -C %s -xzf %s' % (settings.MEDIA_ROOT, file)
-        print u'\t', cmd
+    def uncompress_media(self, file_name):
+        cmd = u'tar -C %s -xzf %s' % (settings.MEDIA_ROOT, file_name)
+        print(u'\t', cmd)
         os.system(cmd)
 
     def mysql_restore(self, infile):
@@ -116,7 +119,7 @@ class Command(BaseCommand):
             args += ["--port=%s" % self.port]
         args += [self.db]
         cmd = 'mysql %s < %s' % (' '.join(args), infile)
-        print '\t', cmd
+        print('\t', cmd)
         os.system(cmd)
 
     def posgresql_restore(self, infile):
@@ -133,5 +136,5 @@ class Command(BaseCommand):
         args.append("-o %s" % os.path.join(self.tempdir, 'dump.log'))
         args.append(self.db)
         cmd = ' '.join(args)
-        print '\t', cmd
+        print('\t', cmd)
         os.system(cmd)

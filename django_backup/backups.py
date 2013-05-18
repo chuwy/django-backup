@@ -12,11 +12,12 @@ from django.conf import settings
 
 class PostgresBackup(object):
     def pack(self):
+        db = getattr(settings, 'DATABASES')['default']
         filename = os.path.join(self.tmp_catalog, 'db.sql')
         command_tmpl = 'pg_dump -o -w -Fc -Z 7 -U {USER} -C -f {FILE} {NAME}'
         command = command_tmpl.format(
-            USER='chuwy',
-            NAME=self.project.db_name,
+            USER=db['USER']
+            NAME=db['NAME']
             FILE=filename)
         subprocess.Popen(command.split()).wait()
         self.db = filename
@@ -38,6 +39,7 @@ class MediaBackup(object):
         filename = os.path.join(self.tmp_catalog, 'media')
         media = shutil.make_archive(filename, 'zip', root_dir=media_root)
         self.archive_path = media
+        print media
 
     def create_tmp(self):
         self.temp_dir = tempfile.mkdtemp()

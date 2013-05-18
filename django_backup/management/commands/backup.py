@@ -177,12 +177,13 @@ class Command(BaseCommand):
                     dest='clean_remote_rsync',
                     help='Clean up remote broken rsync backups'),
     )
+    
 
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
         default_config = [
             {'saver': 'django_backup.savers.LocaldirSaver',
-             'backup': ['django_backup.backups.MediaBackup']}
+             'backups': ['django_backup.backups.MediaBackup']}
         ]
         backup_config = getattr(settings, 'BACKUP_CONFIG', default_config)
         self.savers = []
@@ -195,8 +196,10 @@ class Command(BaseCommand):
                 saver.append_backup(BackupClass)
 
 
-
     def handle(self, *args, **options):
+        for saver in self.savers:
+            saver.save()
+
 
         self.time_suffix = time.strftime(TIME_FORMAT)
         self.email = options.get('email')

@@ -23,6 +23,10 @@ class BaseSaver(object):
         raise NotImplementedError
 
 
+class RsyncSaver(object):
+    pass
+
+
 class LocaldirSaver(object):
     """
     Class responsible for manipulating with completed packed backups
@@ -36,11 +40,10 @@ class LocaldirSaver(object):
     def get_path(self):
         pass
 
-    def to_local_dir(self, path=None):
-        pass
-
     def save(self, backup=None):
-        pass
+        for Backuper in self.backups:
+            backup = Backuper()
+            backup.pack()
 
     def list(self):
         return os.listdir(self.path)

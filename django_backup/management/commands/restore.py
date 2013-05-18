@@ -25,21 +25,12 @@ class Command(BaseCommand):
         return time.strftime(TIME_FORMAT)
 
     def handle(self, *args, **options):
-        try:
-            self.engine = settings.DATABASES['default']['ENGINE']
-            self.db = settings.DATABASES['default']['NAME']
-            self.user = settings.DATABASES['default']['USER']
-            self.passwd = settings.DATABASES['default']['PASSWORD']
-            self.host = settings.DATABASES['default']['HOST']
-            self.port = settings.DATABASES['default']['PORT']
-        except NameError:       # TODO: remove >1.2 compliance
-            self.engine = settings.DATABASE_ENGINE
-            self.db = settings.DATABASE_NAME
-            self.user = settings.DATABASE_USER
-            self.passwd = settings.DATABASE_PASSWORD
-            self.host = settings.DATABASE_HOST
-            self.port = settings.DATABASE_PORT
-
+        self.engine = settings.DATABASES['default']['ENGINE']
+        self.db = settings.DATABASES['default']['NAME']
+        self.user = settings.DATABASES['default']['USER']
+        self.passwd = settings.DATABASES['default']['PASSWORD']
+        self.host = settings.DATABASES['default']['HOST']
+        self.port = settings.DATABASES['default']['PORT']
         self.backup_dir = settings.BACKUP_LOCAL_DIRECTORY
         self.remote_dir = settings.RESTORE_FROM_FTP_DIRECTORY or ''
         self.ftp_server = settings.BACKUP_FTP_SERVER

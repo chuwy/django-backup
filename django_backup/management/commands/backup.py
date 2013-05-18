@@ -12,6 +12,8 @@ from django.core.mail import EmailMessage
 
 import pysftp as ssh
 
+from django_backup.utils import import_class
+
 TIME_FORMAT = '%Y%m%d-%H%M%S'
 regex = re.compile(r'(\d){8}-(\d){6}')
 GOOD_RSYNC_FLAG = '__good_backup'
@@ -176,7 +178,26 @@ class Command(BaseCommand):
                     help='Clean up remote broken rsync backups'),
     )
 
+    def __init__(self, *args, **kwargs):
+        super(Command, self).__init__(*args, **kwargs)
+        default_config = [
+            {'saver': 'django_backup.savers.LocaldirSaver',
+             'backup': ['django_backup.backups.MediaBackup']}
+        ]
+        backup_config = getattr(settings, 'BACKUP_CONFIG', default_config)
+        self.savers = []
+        for backup_saver in backup_config:
+            SaverClass = import_class(backup_saver['saver'])
+            saver = SaverClass()
+            self.savers.append(saver)
+            for backup in backup_saver['backups']:
+                BackupClass = import_class(backup)
+                saver.append_backup(BackupClass)
+
+
+
     def handle(self, *args, **options):
+
         self.time_suffix = time.strftime(TIME_FORMAT)
         self.email = options.get('email')
         self.ftp = options.get('ftp')

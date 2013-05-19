@@ -8,12 +8,7 @@ from django.conf import settings
 
 
 class Command(BaseCommand):
-    help = "Restores latest backup."
-    option_list = BaseCommand.option_list + (
-        make_option('--media', '-m',
-                    action='store_true',
-                    dest='media',
-                    help='Restore media dir'),)
+    help = "Restores choosen backup"
 
     def handle(self, *args, **options):
         pass

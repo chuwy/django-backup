@@ -1,10 +1,3 @@
-from datetime import datetime
-from datetime import timedelta
-from optparse import make_option
-import os
-import re
-import time
-
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
@@ -12,13 +5,7 @@ from django_backup.utils import import_class
 
 
 class Command(BaseCommand):
-    help = "Backup database. Only Mysql and Postgresql engines are implemented"
-    option_list = BaseCommand.option_list + (
-        make_option('--email',
-                    default=None,
-                    dest='email',
-                    help="Sends email with attached dump file"),)
-
+    help = "Backup all necessary data"
 
     def __init__(self, *args, **kwargs):
         """
@@ -41,5 +28,10 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
+        """
+        Main backup method, responsible for data manipulation.
+        """
         for saver in self.savers:
+            saver.get_archive()
             saver.save()
+            saver.close_archive()

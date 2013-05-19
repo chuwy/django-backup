@@ -2,6 +2,8 @@
 django-backup
 =============
 
+**WARNING!** This fork of django-backup is experimental and highly unstable. Do not use it for production.
+
 Repository: http://github.com/andybak/django-backup
 
 Backup, compress and restore Django database and media files. 

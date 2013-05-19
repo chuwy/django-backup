@@ -18,13 +18,6 @@ def import_class(path):
 def zipdir(dir_path=None, zip_file_path=None, include_dir=True):
     """Create a zip archive from a directory.
 
-    Note that this function is designed to put files in the zip archive with
-    either no parent directory or just one parent directory, so it will trim any
-    leading directories in the filesystem paths and not include them inside the
-    zip archive paths. This is generally the case when you want to just take a
-    directory and make it into a zip file that can be extracted in different
-    locations.
-
     Keyword arguments:
 
     dir_path -- string path to the directory to archive. This is the only

@@ -1,4 +1,5 @@
 import os
+import tempfile
 
 from django.conf import settings
 
@@ -56,6 +57,7 @@ class LocaldirSaver(object):
 
     def append_backup(self, backup):
         self.backups.append(backup)
+
 
 class EmailSaver(object):
     pass

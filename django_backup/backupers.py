@@ -58,6 +58,7 @@ class PostgresBackuper(BaseBackuper):
             USER=db['USER'],
             NAME=db['NAME'],
             FILE=filename)
+        os.environ['PGPASSWORD'] = db['PASSWORD']
         subprocess.Popen(command.split()).wait()
         self.db = filename
 
@@ -68,6 +69,7 @@ class PostgresBackuper(BaseBackuper):
             USER=db['USER'],
             NAME=db['NAME'],
             FILE=self.path)
+        os.environ['PGPASSWORD'] = db['PASSWORD']
         subprocess.Popen(command.split()).wait()
 
 

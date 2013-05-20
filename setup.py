@@ -2,15 +2,15 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'django_backup',
-    packages = find_packages(exclude=('test_project',)),
-    version = '1.0.1',
-    description = 'A fork and extension of Dmitriy Kovalev\'s backup database command for django.',
-    author = 'Dmitriy Kovalev, Michael Huynh, msaelices, Andy Baker, Chen Zhe',
-    #author_email = '',
-    url = 'http://github.com/andybak/django-backup',
+    version = '0.0.1',
+    description = 'Highly customizible and extendable backup system for Django projects',
+    author = 'Anton Parkhomenko',
+    author_email = '<anton@chuwy.ru>',
+    url = 'http://github.com/chuwy/django-backup'
     classifiers=[
-        'Programming Language :: Python', 
-        'Framework :: Django', 
+        'Programming Language :: Python',
+        'Framework :: Django',
+        'Intended Audience :: System Administrators',
         'License :: OSI Approved :: BSD License',
     ]
 )

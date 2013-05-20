@@ -1,3 +1,0 @@
-Django==1.4
-pysftp==0.2.2
-MySQL-python==1.2.3

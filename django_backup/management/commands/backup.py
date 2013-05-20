@@ -32,6 +32,6 @@ class Command(BaseCommand):
         Main backup method, responsible for data manipulation.
         """
         for saver in self.savers:
-            saver.create_archive()
+            saver.prepare()
             saver.save()
             saver.close_archive()

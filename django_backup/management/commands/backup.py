@@ -14,7 +14,7 @@ class Command(BaseCommand):
         super(Command, self).__init__(*args, **kwargs)
         default_config = [
             {'saver': 'django_backup.savers.LocaldirSaver',
-             'backups': ['django_backup.backups.MediaBackup']}
+             'backupers': ['django_backup.backupers.MediaBackuper']}
         ]
         backup_config = getattr(settings, 'BACKUP_CONFIG', default_config)
         self.savers = []
@@ -22,9 +22,9 @@ class Command(BaseCommand):
             SaverClass = import_class(backup_saver['saver'])
             saver = SaverClass()
             self.savers.append(saver)
-            for backup in backup_saver['backups']:
-                BackupClass = import_class(backup)
-                saver.append_backup(BackupClass)
+            for backuper in backup_saver['backupers']:
+                BackuperClass = import_class(backuper)
+                saver.append_backuper(BackuperClass)
 
 
     def handle(self, *args, **options):
@@ -32,6 +32,6 @@ class Command(BaseCommand):
         Main backup method, responsible for data manipulation.
         """
         for saver in self.savers:
-            saver.get_archive()
+            saver.create_archive()
             saver.save()
             saver.close_archive()

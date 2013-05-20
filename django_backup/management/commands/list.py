@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-
-# -*- coding: utf-8 -*-
-
-__author__ = 'Anton Parkhomenko'
-
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
@@ -12,13 +6,15 @@ from django_backup.utils import import_class
 
 class Command(BaseCommand):
     help = "List all available backups"
-    option_list = BaseCommand.option_list
 
     def __init__(self, *args, **kwargs):
+        """
+        Load savers and backupers, set command options based on them.
+        """
         super(Command, self).__init__(*args, **kwargs)
         default_config = [
             {'saver': 'django_backup.savers.LocaldirSaver',
-             'backup': ['django_backup.backups.MediaBackup']}
+             'backupers': ['django_backup.backupers.MediaBackuper']}
         ]
         backup_config = getattr(settings, 'BACKUP_CONFIG', default_config)
         self.savers = []
@@ -29,7 +25,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for saver in self.savers:
-            self.stdout.write('Backups in %s:' % saver)
+            self.stdout.write('Backups in %s:\n' % saver)
             for backup in saver.list():
                 print backup
 

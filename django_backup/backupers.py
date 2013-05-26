@@ -90,3 +90,6 @@ class MediaBackuper(BaseBackuper):
         archive = ZipFile(self.path, 'r')
         archive.extractall(path=media_root)
         archive.close()
+
+class RequirementsBackuper(BaseBackuper):
+    pass

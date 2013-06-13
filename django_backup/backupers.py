@@ -71,8 +71,8 @@ class PostgresBackuper(BaseBackuper):
             USER=db['USER'],
             NAME=db['NAME'],
             FILE=self.path)
-        if db.get('HOST'): command += ' -h {HOST}'.format(db['HOST'])
-        if db.get('PORT'): command += ' -p {PORT}'.format(db['PORT'])
+        if db.get('HOST'): command += ' -h {HOST}'.format(HOST=db['HOST'])
+        if db.get('PORT'): command += ' -p {PORT}'.format(PORT=db['PORT'])
         os.environ['PGPASSWORD'] = db['PASSWORD']
         subprocess.Popen(command.split()).wait()
 

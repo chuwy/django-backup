@@ -5,20 +5,18 @@
 import os
 import shutil
 import subprocess
+import logging
 import tempfile
 from zipfile import ZipFile
 
 from django.conf import settings
 
 
-class BaseBackuper(object):
-    def __init__(self, path=None):
-        if not path:            # Creating (not restoring) backup
-            self.create_tmp()
-        else:
-            self.path = path
+logger_name = getattr(settings, 'BACKUP_LOGGER')
+logger = logging.getLogger(logger_name)
 
-    def create_tmp(self):
+class BaseBackuper(object):
+    def __init__(self):
         self.tmp_catalog = tempfile.mkdtemp()
 
     def clean_tmp(self):
@@ -55,7 +53,7 @@ class PostgresBackuper(BaseBackuper):
         filename = os.path.join(self.tmp_catalog, self.get_filename())
         command_tmpl = 'pg_dump --oids --no-password --format=custom ' \
                        '--compress=7 --username={USER} --create ' \
-                       '--filename={FILE} {NAME}'
+                       '--file={FILE} {NAME}'
         command = command_tmpl.format(
             USER=db['USER'],
             NAME=db['NAME'],
@@ -63,8 +61,11 @@ class PostgresBackuper(BaseBackuper):
         if db.get('HOST'): command += ' -h {HOST}'.format(HOST=db['HOST'])
         if db.get('PORT'): command += ' -p {PORT}'.format(PORT=db['PORT'])
         os.environ['PGPASSWORD'] = db['PASSWORD']
-        subprocess.Popen(command.split()).wait()
-        self.db = filename
+        pg_dump_process = subprocess.Popen(command.split(), stderr=subprocess.PIPE)
+        return_code = pg_dump_process.wait()
+        if return_code:
+            logger.error(u"pg_dump error {}".format(return_code))
+            logger.error(pg_dump_process.stderr.read())
 
     def unpack(self):
         db = getattr(settings, 'DATABASES')['default']

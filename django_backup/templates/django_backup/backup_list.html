@@ -1,0 +1,6 @@
+{% for saver in savers %}
+    Saver: {{ saver }}
+    {% for backup in saver.list %}
+        {{ backup }}
+    {% endfor %}
+{% endfor %}

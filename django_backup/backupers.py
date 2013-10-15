@@ -58,6 +58,8 @@ class PostgresBackuper(BaseBackuper):
             USER=db['USER'],
             NAME=db['NAME'],
             FILE=filename)
+        if db.get('HOST'): command += ' -h {HOST}'.format(HOST=db['HOST'])
+        if db.get('PORT'): command += ' -p {PORT}'.format(PORT=db['PORT'])
         os.environ['PGPASSWORD'] = db['PASSWORD']
         subprocess.Popen(command.split()).wait()
         self.db = filename
@@ -69,6 +71,8 @@ class PostgresBackuper(BaseBackuper):
             USER=db['USER'],
             NAME=db['NAME'],
             FILE=self.path)
+        if db.get('HOST'): command += ' -h {HOST}'.format(HOST=db['HOST'])
+        if db.get('PORT'): command += ' -p {PORT}'.format(PORT=db['PORT'])
         os.environ['PGPASSWORD'] = db['PASSWORD']
         subprocess.Popen(command.split()).wait()
 
@@ -90,3 +94,6 @@ class MediaBackuper(BaseBackuper):
         archive = ZipFile(self.path, 'r')
         archive.extractall(path=media_root)
         archive.close()
+
+class RequirementsBackuper(BaseBackuper):
+    pass

@@ -3,12 +3,13 @@ import os
 import tempfile
 from zipfile import ZipFile, ZIP_DEFLATED
 
-from django.conf import settings
+from django.conf import settings as django_settings
 
 
 class BaseSaver(object):
     backupers = list()
     settings = dict()
+    default_settings = dict()       # Every subclass has its own
 
     def append_backuper(self, backuper):
         self.backupers.append(backuper)
@@ -18,13 +19,11 @@ class BaseSaver(object):
         Get from settings.py every settings which starts with
         uppercase classname and save it to self.settings dict.
         """
-        class_name = self.__class__.__name__.upper()
-        for setting_name in dir(settings):            # Django-project settings
-            if setting_name.startswith('BACKUP_' + class_name + '_'):
-                setting = getattr(settings, setting_name)
-                self.settings.update(
-                    {setting_name[8 + len(class_name):].lower(): setting}
-                )
+        for setting in self.default_settings.keys():
+            if hasattr(django_settings, setting):
+                self.settings.update({setting: getattr(django_settings, setting)})
+            else:
+                self.settings.update({setting: self.default_settings[setting]})
 
 
 class LocaldirSaver(BaseSaver):
@@ -33,10 +32,15 @@ class LocaldirSaver(BaseSaver):
     stored in local directory.
     """
 
+    default_settings = {
+        'BACKUP_LOCALDIRSAVER_DIR': os.path.join(django_settings.PROJECT_ROOT,
+                                                 'backups'),
+    }
+
     def __init__(self):
         """ Set all settings """
         self.parse_settings()
-        self.path = self.settings.get('dir')
+        self.path = self.settings.get('BACKUP_LOCALDIRSAVER_DIR')
         if not os.path.exists(self.path):
             os.mkdir(self.path)
         if not os.path.isdir(self.path):

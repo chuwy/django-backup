@@ -53,7 +53,9 @@ class PostgresBackuper(BaseBackuper):
     def pack(self):
         db = getattr(settings, 'DATABASES')['default']
         filename = os.path.join(self.tmp_catalog, self.get_filename())
-        command_tmpl = 'pg_dump -o -w -Fc -Z 7 -U {USER} -C -f {FILE} {NAME}'
+        command_tmpl = 'pg_dump --oids --no-password --format=custom ' \
+                       '--compress=7 --username={USER} --create ' \
+                       '--filename={FILE} {NAME}'
         command = command_tmpl.format(
             USER=db['USER'],
             NAME=db['NAME'],
@@ -66,7 +68,8 @@ class PostgresBackuper(BaseBackuper):
 
     def unpack(self):
         db = getattr(settings, 'DATABASES')['default']
-        command_tmpl = 'pg_restore -i -U {USER} -d {NAME} -v {FILE}'
+        command_tmpl = 'pg_restore --username={USER} --dbname={NAME} ' \
+                       '--verbose {FILE}'
         command = command_tmpl.format(
             USER=db['USER'],
             NAME=db['NAME'],

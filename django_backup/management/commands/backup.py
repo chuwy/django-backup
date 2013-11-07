@@ -7,11 +7,11 @@ from django_backup.utils import import_class
 class Command(BaseCommand):
     help = "Backup all necessary data"
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         """
         Load savers and backupers, set command options based on them.
         """
-        super(Command, self).__init__(*args, **kwargs)
+        super(Command, self).__init__()
         default_config = [
             {'saver': 'django_backup.savers.LocaldirSaver',
              'backupers': ['django_backup.backupers.MediaBackuper']}

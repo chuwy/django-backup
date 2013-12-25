@@ -12,7 +12,7 @@ from zipfile import ZipFile
 from django.conf import settings
 
 
-logger_name = getattr(settings, 'BACKUP_LOGGER')
+logger_name = getattr(settings, 'BACKUP_LOGGER', __name__)
 logger = logging.getLogger(logger_name)
 
 class BaseBackuper(object):

@@ -16,8 +16,9 @@ logger_name = getattr(settings, 'BACKUP_LOGGER', __name__)
 logger = logging.getLogger(logger_name)
 
 class BaseBackuper(object):
-    def __init__(self):
+    def __init__(self, path=None):
         self.tmp_catalog = tempfile.mkdtemp()
+        self.path = path
 
     def clean_tmp(self):
         if self.tmp_catalog and os.path.isdir(self.tmp_catalog):

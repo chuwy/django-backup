@@ -5,6 +5,8 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 from django.conf import settings as django_settings
 
+from django_backup.utils import validate_backup_file
+
 
 class BaseSaver(object):
     backupers = list()
@@ -68,6 +70,7 @@ class LocaldirSaver(BaseSaver):
     def list(self):
         """ List all backups. Should return list of filenames """
         all_backups = os.listdir(self.path)
+        all_backups = filter(validate_backup_file, all_backups)
         all_backups.sort(
             key=lambda x: datetime.strptime(x, '%d-%m-%Y_%H-%M.zip')
         )

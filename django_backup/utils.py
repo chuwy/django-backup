@@ -4,6 +4,7 @@
 
 __author__ = 'Anton Parkhomenko'
 
+from datetime import datetime
 import os
 import zipfile
 
@@ -63,3 +64,11 @@ def zipdir(dir_path=None, zip_file_path=None, include_dir=True):
             #Here to allow for inserting an empty directory.  Still TBD/TODO.
             outFile.writestr(zipInfo, "")
     outFile.close()
+
+
+def validate_backup_file(f):
+    try:
+        datetime.strptime(f, '%d-%m-%Y_%H-%M.zip')
+        return True
+    except ValueError:
+        return False

@@ -95,6 +95,9 @@ class LocaldirSaver(BaseSaver):
     def close_archive(self):
         self.archive.close()
 
+    def __str__(self):
+        return 'LocalDir at ' + self.path
+
 
 class SCPSaver(BaseSaver):
     pass
